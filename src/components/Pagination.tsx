@@ -13,7 +13,7 @@ export default function Pagination({ currentPage, totalPages, basePath = "/" }: 
 
   function getPageUrl(page: number): string {
     if (page === 1) return basePath;
-    return `${basePath}/page/${page}`;
+    return `${basePath}/pages/${page}`;
   }
 
   return (
