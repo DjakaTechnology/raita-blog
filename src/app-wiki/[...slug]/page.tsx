@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getWikiPage, getAllWikiSlugs, getAllWikiPageMeta } from "@/lib/wiki";
 import WikiBreadcrumb from "@/components/WikiBreadcrumb";
 import TableExpander from "@/components/TableExpander";
-import "@/app-wiki/wiki-content.css";
+import "../wiki-content.css";
 
 export function generateStaticParams() {
   return getAllWikiSlugs().map((slug) => ({

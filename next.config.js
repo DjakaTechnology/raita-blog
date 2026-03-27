@@ -1,13 +1,17 @@
 /** @type {import('next').NextConfig} */
-const mode = process.env.BUILD_MODE || 'blog';
+const fs = require('fs');
+const path = require('path');
+
+// Detect wiki mode: if app-blog-backup exists, we've swapped to wiki mode
+const isWiki = fs.existsSync(path.join(__dirname, 'src/app-blog-backup'));
 
 const nextConfig = {
   output: 'export',
-  basePath: mode === 'wiki' ? '/wiki' : '/blog',
+  basePath: isWiki ? '/wiki' : '/blog',
   images: {
     unoptimized: true,
   },
-  ...(mode === 'wiki' && { distDir: 'out-wiki' }),
+  ...(isWiki && { distDir: 'out-wiki' }),
 };
 
 module.exports = nextConfig;
