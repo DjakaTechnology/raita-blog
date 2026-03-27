@@ -11,7 +11,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  ...(isWiki && { distDir: 'out-wiki' }),
 };
 
 module.exports = nextConfig;
