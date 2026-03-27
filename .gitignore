@@ -6,3 +6,5 @@ out-wiki/
 *.tsbuildinfo
 next-env.d.ts
 src/app-blog-backup/
+
+.vercel
