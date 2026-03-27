@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:wiki": "node scripts/swap-app.mjs wiki && next dev -c next.config.wiki.js",
-    "build:blog": "node scripts/upload-images.mjs && node scripts/generate-search-index.mjs blog && node scripts/generate-rss.mjs && node scripts/generate-sitemap.mjs && next build -c next.config.blog.js",
-    "build:wiki": "node scripts/swap-app.mjs wiki && node scripts/upload-images.mjs && node scripts/generate-search-index.mjs wiki && node scripts/generate-sitemap.mjs && next build -c next.config.wiki.js && node scripts/swap-app.mjs blog",
+    "dev:wiki": "node scripts/swap-app.mjs wiki && BUILD_MODE=wiki next dev",
+    "build:blog": "node scripts/upload-images.mjs && node scripts/generate-search-index.mjs blog && node scripts/generate-rss.mjs && node scripts/generate-sitemap.mjs && next build",
+    "build:wiki": "node scripts/swap-app.mjs wiki && node scripts/upload-images.mjs && node scripts/generate-search-index.mjs wiki && node scripts/generate-sitemap.mjs && BUILD_MODE=wiki next build && node scripts/swap-app.mjs blog",
     "lint": "eslint"
   },
   "dependencies": {
