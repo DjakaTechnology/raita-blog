@@ -32,8 +32,8 @@ jobs:
 
       - name: Copy output for Vercel
         run: |
-          mkdir -p .vercel/output/static
-          cp -r out/* .vercel/output/static/
+          mkdir -p .vercel/output/static/blog
+          cp -r out/* .vercel/output/static/blog/
           echo '{"version":3}' > .vercel/output/config.json
 
       - name: Deploy to Vercel
@@ -62,8 +62,8 @@ jobs:
 
       - name: Copy output for Vercel
         run: |
-          mkdir -p .vercel/output/static
-          cp -r out/* .vercel/output/static/
+          mkdir -p .vercel/output/static/wiki
+          cp -r out/* .vercel/output/static/wiki/
           echo '{"version":3}' > .vercel/output/config.json
 
       - name: Deploy to Vercel
