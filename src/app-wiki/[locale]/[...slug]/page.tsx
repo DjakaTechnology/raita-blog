@@ -29,23 +29,27 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const page = await getWikiPage(slug, locale as WikiLocale);
   if (!page) return {};
   const pageUrl = `https://raita.ai/wiki/${locale}/${page.slug}`;
+  const ogTitle = `${page.title} — Raita Wiki Documentation`;
+  const ogDescription = page.description.length >= 110
+    ? page.description
+    : `${page.description} Learn more in the Raita Wiki — comprehensive documentation for the AI content operations platform.`;
   return {
     title: page.title,
     description: page.description,
     alternates: { canonical: pageUrl },
     openGraph: {
-      title: `${page.title} | Raita Wiki`,
-      description: page.description,
+      title: ogTitle,
+      description: ogDescription,
       type: "article",
       url: pageUrl,
       siteName: "Raita Wiki",
-      images: [{ url: "https://raita.ai/wiki/og-wiki.png", width: 1200, height: 630, alt: "Raita Wiki" }],
+      images: [{ url: "https://raita-wiki.vercel.app/wiki/og-wiki.png", width: 1200, height: 630, alt: "Raita Wiki" }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${page.title} | Raita Wiki`,
-      description: page.description,
-      images: ["https://raita.ai/wiki/og-wiki.png"],
+      title: ogTitle,
+      description: ogDescription,
+      images: ["https://raita-wiki.vercel.app/wiki/og-wiki.png"],
     },
   };
 }
