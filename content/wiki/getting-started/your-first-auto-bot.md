@@ -43,7 +43,7 @@ Set the **Check every** interval — how often Raita polls for new articles (e.g
 
 ## Step 4: Set Behavior
 
-- **When new content is found** — choose **Manual pick (review in inbox)** to review articles before generating, or **Auto create article (draft)** to generate automatically
+- **When new content is found** — choose **Auto create article (draft)**. This lets Raita automatically generate articles from every matching feed item without manual approval — you can always review and edit them later in the Article Worker tab.
 - **Title & Keyword** — choose how to extract the article title (e.g. "Rewrite title (slug as keyword)")
 
 ---
