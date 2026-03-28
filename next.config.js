@@ -8,6 +8,7 @@ const isWiki = fs.existsSync(path.join(__dirname, 'src/app-blog-backup'));
 const nextConfig = {
   output: 'export',
   basePath: isWiki ? '/wiki' : '/blog',
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },
