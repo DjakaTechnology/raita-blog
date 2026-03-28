@@ -1,0 +1,69 @@
+name: Deploy Blog & Wiki
+
+on:
+  push:
+    branches: [main]
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+jobs:
+  deploy-blog:
+    name: Deploy Blog
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_BLOG_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Pull Vercel config
+        run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Build blog
+        run: npx vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+
+  deploy-wiki:
+    name: Deploy Wiki
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WIKI_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Pull Vercel config
+        run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - name: Override build command for wiki
+        run: |
+          # Update the build command in .vercel/project.json to use wiki build
+          node -e "
+            const fs = require('fs');
+            const p = JSON.parse(fs.readFileSync('.vercel/project.json','utf8'));
+            p.settings = p.settings || {};
+            p.settings.buildCommand = 'npm run build:wiki';
+            fs.writeFileSync('.vercel/project.json', JSON.stringify(p, null, 2));
+          "
+
+      - name: Build wiki
+        run: npx vercel build --prod --token=$VERCEL_TOKEN
+
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
