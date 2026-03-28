@@ -20,9 +20,9 @@ If you haven't already, create a project for your auto bot. Go to **Project** in
 
 ## Step 2: Open Auto-Pilot
 
-Inside your project, click the **Auto-Pilot** tab at the top (next to Article Worker and SILO Planner).
+Inside your project, click **+ New Task** to open the task picker. Select **Auto-Pilot**.
 
-Click **+ New Task** to open the Auto-Pilot configuration form.
+![New Task picker showing Auto-Pilot option](../images/new-task-picker.png)
 
 ---
 
