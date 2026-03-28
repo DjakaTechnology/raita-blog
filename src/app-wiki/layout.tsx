@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WikiSidebar from "@/components/WikiSidebar";
 import { getWikiTree } from "@/lib/wiki";
+import type { WikiLocale } from "@/lib/wiki";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -32,14 +33,17 @@ export default function WikiLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const sections = getWikiTree();
+  const sectionsByLocale = {
+    en: getWikiTree("en"),
+    id: getWikiTree("id"),
+  };
 
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={inter.className}>
         <Header />
         <div className="flex min-h-screen">
-          <WikiSidebar sections={sections} />
+          <WikiSidebar sectionsByLocale={sectionsByLocale} />
           <main className="flex-1 lg:ml-0">{children}</main>
         </div>
         <Footer />

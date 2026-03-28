@@ -83,13 +83,14 @@ function SidebarSection({ section, currentSlug, linkPrefix = "", depth = 0 }: { 
   );
 }
 
-export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
+export default function WikiSidebar({ sectionsByLocale }: { sectionsByLocale: Record<string, WikiSection[]> }) {
   const pathname = usePathname();
-  // Extract locale from /wiki/en/... or /wiki/id/...
-  const localeMatch = pathname.match(/^\/wiki\/(en|id)(?:\/|$)/);
+  const stripped = pathname.replace(/^\/wiki\/?/, "").replace(/^\//, "");
+  const localeMatch = stripped.match(/^(en|id)(?:\/|$)/);
   const locale = localeMatch ? localeMatch[1] : "en";
   const isIndonesian = locale === "id";
-  const currentSlug = pathname.replace(/^\/wiki\/(?:en|id)\/?/, "").replace(/^\//, "").replace(/\/$/, "");
+  const sections = sectionsByLocale[locale] || sectionsByLocale["en"] || [];
+  const currentSlug = localeMatch ? stripped.replace(/^(?:en|id)\/?/, "") : "";
   const linkPrefix = `/${locale}`;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
