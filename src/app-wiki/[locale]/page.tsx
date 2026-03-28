@@ -16,10 +16,26 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const isId = locale === "id";
+  const title = isId ? "Raita Wiki (Indonesia)" : "Raita Wiki";
+  const description = isId ? "Dokumentasi dan panduan lengkap untuk Raita." : "Documentation and knowledge base for Raita.";
   return {
-    title: isId ? "Raita Wiki (Indonesia)" : "Raita Wiki",
-    description: isId ? "Dokumentasi dan panduan lengkap untuk Raita." : "Documentation and knowledge base for Raita.",
+    title,
+    description,
     alternates: { canonical: `https://raita.ai/wiki/${locale}` },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `https://raita.ai/wiki/${locale}`,
+      siteName: "Raita Wiki",
+      images: [{ url: "https://raita.ai/wiki/og-wiki.png", width: 1200, height: 630, alt: "Raita Wiki" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://raita.ai/wiki/og-wiki.png"],
+    },
   };
 }
 

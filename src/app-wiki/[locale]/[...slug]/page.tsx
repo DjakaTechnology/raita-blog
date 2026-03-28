@@ -28,11 +28,25 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale, slug } = await params;
   const page = await getWikiPage(slug, locale as WikiLocale);
   if (!page) return {};
+  const pageUrl = `https://raita.ai/wiki/${locale}/${page.slug}`;
   return {
     title: page.title,
     description: page.description,
-    alternates: { canonical: `https://raita.ai/wiki/${locale}/${page.slug}` },
-    openGraph: { title: page.title, description: page.description, type: "article", url: `https://raita.ai/wiki/${locale}/${page.slug}` },
+    alternates: { canonical: pageUrl },
+    openGraph: {
+      title: `${page.title} | Raita Wiki`,
+      description: page.description,
+      type: "article",
+      url: pageUrl,
+      siteName: "Raita Wiki",
+      images: [{ url: "https://raita.ai/wiki/og-wiki.png", width: 1200, height: 630, alt: "Raita Wiki" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${page.title} | Raita Wiki`,
+      description: page.description,
+      images: ["https://raita.ai/wiki/og-wiki.png"],
+    },
   };
 }
 
