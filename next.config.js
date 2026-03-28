@@ -11,6 +11,19 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  turbopack: {},
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.plugins.push({
+        apply(compiler) {
+          compiler.hooks.afterCompile.tap('WatchContent', (compilation) => {
+            compilation.contextDependencies.add(path.join(__dirname, 'content'));
+          });
+        },
+      });
+    }
+    return config;
+  },
 };
 
 module.exports = nextConfig;

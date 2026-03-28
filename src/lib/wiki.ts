@@ -129,6 +129,51 @@ export async function getWikiPage(slugParts: string[]): Promise<WikiPage | undef
   };
 }
 
+export function getWikiSection(slug: string): WikiSection | undefined {
+  const sections = getWikiTree();
+
+  function find(sections: WikiSection[], target: string): WikiSection | undefined {
+    for (const s of sections) {
+      if (s.slug === target) return s;
+      const found = find(s.children, target);
+      if (found) return found;
+    }
+    return undefined;
+  }
+
+  return find(sections, slug);
+}
+
+/** Flat ordered list of all pages following the sidebar order (section index → pages → children recursively) */
+export function getWikiPageList(): WikiPageMeta[] {
+  const sections = getWikiTree();
+  const list: WikiPageMeta[] = [];
+
+  function flatten(section: WikiSection) {
+    // Add section index page
+    list.push({
+      slug: section.slug,
+      title: section.title,
+      description: section.description,
+      order: section.order,
+    });
+    // Add section's pages
+    for (const page of section.pages) {
+      list.push(page);
+    }
+    // Recurse into children
+    for (const child of section.children) {
+      flatten(child);
+    }
+  }
+
+  for (const section of sections) {
+    flatten(section);
+  }
+
+  return list;
+}
+
 export function getAllWikiPageMeta(): WikiPageMeta[] {
   if (!fs.existsSync(WIKI_DIR)) return [];
   const pages: WikiPageMeta[] = [];

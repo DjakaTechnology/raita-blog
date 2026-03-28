@@ -1,13 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import type { WikiSection } from "@/lib/types";
+import type { WikiSection, WikiPageMeta } from "@/lib/types";
+
+function flattenSections(sections: WikiSection[]): WikiPageMeta[] {
+  const results: WikiPageMeta[] = [];
+  for (const section of sections) {
+    results.push({ slug: section.slug, title: section.title, description: section.description, order: section.order });
+    for (const page of section.pages) {
+      results.push(page);
+    }
+    results.push(...flattenSections(section.children));
+  }
+  return results;
+}
+
+function isActive(currentSlug: string, sectionSlug: string) {
+  return currentSlug === sectionSlug || currentSlug.startsWith(sectionSlug + "/");
+}
 
 function SidebarSection({ section, currentSlug, depth = 0 }: { section: WikiSection; currentSlug: string; depth?: number }) {
   const [expanded, setExpanded] = useState(
-    currentSlug.startsWith(section.slug)
+    isActive(currentSlug, section.slug)
   );
+
+  // Auto-expand when navigating into this section
+  useEffect(() => {
+    if (isActive(currentSlug, section.slug)) {
+      setExpanded(true);
+    }
+  }, [currentSlug, section.slug]);
   const hasChildren = section.children.length > 0 || section.pages.length > 0;
 
   return (
@@ -59,8 +83,23 @@ function SidebarSection({ section, currentSlug, depth = 0 }: { section: WikiSect
   );
 }
 
-export default function WikiSidebar({ sections, currentSlug }: { sections: WikiSection[]; currentSlug: string }) {
+export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
+  const pathname = usePathname();
+  const currentSlug = pathname.replace(/^\/wiki\/?/, "").replace(/^\//, "").replace(/\/$/, "");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  const allPages = flattenSections(sections);
+  const searchResults = query.length >= 2
+    ? allPages.filter((p) => {
+        const q = query.toLowerCase();
+        return p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q);
+      })
+    : [];
 
   return (
     <>
@@ -74,25 +113,63 @@ export default function WikiSidebar({ sections, currentSlug }: { sections: WikiS
         </svg>
       </button>
       <aside className={`
-        fixed lg:sticky top-0 left-0 z-10 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto p-4 pt-20 transition-transform
+        fixed lg:sticky top-0 left-0 z-10 h-screen w-64 bg-sidebar border-r border-sidebar-border overflow-y-auto p-4 pt-14 transition-transform
         lg:translate-x-0 lg:block
         ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
-        <nav className="flex flex-col gap-1">
-          <Link
-            href="/"
-            className={`text-sm font-semibold py-1.5 px-2 rounded transition-colors ${
-              currentSlug === "" ? "text-primary bg-primary/10" : "text-foreground hover:bg-muted"
-            }`}
-          >
-            Wiki Home
-          </Link>
-          <div className="mt-2 flex flex-col gap-1">
-            {sections.map((section) => (
-              <SidebarSection key={section.slug} section={section} currentSlug={currentSlug} />
+        <div className="relative mb-3">
+          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search wiki..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-8 pr-3 py-1.5 text-sm rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
+
+        {query.length >= 2 ? (
+          <div className="flex flex-col gap-0.5">
+            {searchResults.length === 0 && (
+              <p className="text-xs text-muted-foreground px-2 py-2">No results found</p>
+            )}
+            {searchResults.map((page) => (
+              <Link
+                key={page.slug}
+                href={`/${page.slug}`}
+                onClick={() => setQuery("")}
+                className={`text-sm py-1.5 px-2 rounded transition-colors ${
+                  currentSlug === page.slug
+                    ? "text-primary font-medium bg-primary/10"
+                    : "text-foreground hover:text-primary hover:bg-muted"
+                }`}
+              >
+                {page.title}
+                {page.description && (
+                  <span className="block text-xs text-muted-foreground truncate">{page.description}</span>
+                )}
+              </Link>
             ))}
           </div>
-        </nav>
+        ) : (
+          <nav className="flex flex-col gap-1">
+            <Link
+              href="/"
+              className={`text-sm font-semibold py-1.5 px-2 rounded transition-colors ${
+                currentSlug === "" ? "text-primary bg-primary/10" : "text-foreground hover:bg-muted"
+              }`}
+            >
+              Wiki Home
+            </Link>
+            <div className="mt-2 flex flex-col gap-1">
+              {sections.map((section) => (
+                <SidebarSection key={section.slug} section={section} currentSlug={currentSlug} />
+              ))}
+            </div>
+          </nav>
+        )}
       </aside>
       {mobileOpen && (
         <div className="fixed inset-0 z-[9] bg-black/30 lg:hidden" onClick={() => setMobileOpen(false)} />

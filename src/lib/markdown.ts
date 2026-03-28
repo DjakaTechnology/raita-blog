@@ -42,11 +42,21 @@ export function rewriteImageUrls(
   basePath: string
 ): string {
   return html.replace(
-    /src="(images\/[^"]+)"/g,
+    /src="((?:\.\.\/)*images\/[^"]+)"/g,
     (match, relativePath) => {
-      const manifestKey = `${imageContext}/${path.basename(relativePath)}`;
+      const filename = path.basename(relativePath);
+      // Try manifest with current context
+      const manifestKey = `${imageContext}/${filename}`;
       const entry = manifest[relativePath] || manifest[manifestKey];
       if (entry) return `src="${entry.r2Url}"`;
+      // For ../images/ paths, resolve relative to parent context
+      if (relativePath.startsWith("../")) {
+        const parentContext = imageContext.split("/").slice(0, -1).join("/");
+        const parentKey = parentContext ? `${parentContext}/images/${filename}` : `wiki/images/${filename}`;
+        const parentEntry = manifest[parentKey];
+        if (parentEntry) return `src="${parentEntry.r2Url}"`;
+        return `src="${basePath}/content-images/${filename}"`;
+      }
       return `src="${basePath}/content-images/${relativePath.replace(/^images\//, "")}"`;
     }
   );

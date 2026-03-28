@@ -1,8 +1,8 @@
 ---
 title: "Getting Started"
-description: "Get up and running with Raita."
+description: "Install Raita, set up your account, and configure your AI provider."
 order: 1
 draft: false
 ---
 
-This section covers the basics of getting started with Raita.
+Everything you need to get Raita up and running on your machine.

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import logoDark from "../../public/logo-dark.svg";
 
 export default function Footer() {
   return (
@@ -6,8 +8,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="flex flex-col gap-3">
           <Link href="https://raita.ai" className="flex items-center">
-            <img src="/blog/favicon.webp" alt="Raita logo" className="w-10 h-10 rounded" />
-            <span className="text-lg font-bold text-gray-50 ml-2">Raita</span>
+            <Image src={logoDark} alt="Raita logo" className="h-12 w-auto" unoptimized />
           </Link>
         </div>
         <div className="flex flex-col gap-3">

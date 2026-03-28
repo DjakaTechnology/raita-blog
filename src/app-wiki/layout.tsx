@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   description: "Documentation and knowledge base for Raita.",
   metadataBase: new URL("https://raita.ai"),
   icons: {
-    icon: "/wiki/favicon.webp",
-    apple: "/wiki/favicon.webp",
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
@@ -39,7 +39,7 @@ export default function WikiLayout({
       <body className={inter.className}>
         <Header />
         <div className="flex min-h-screen">
-          <WikiSidebar sections={sections} currentSlug="" />
+          <WikiSidebar sections={sections} />
           <main className="flex-1 lg:ml-0">{children}</main>
         </div>
         <Footer />
