@@ -5,17 +5,17 @@ interface BreadcrumbItem {
   href: string;
 }
 
-export default function WikiBreadcrumb({ slugParts, titles }: { slugParts: string[]; titles: Record<string, string> }) {
+export default function WikiBreadcrumb({ slugParts, titles, basePath = "" }: { slugParts: string[]; titles: Record<string, string>; basePath?: string }) {
   if (slugParts.length === 0) return null;
 
-  const items: BreadcrumbItem[] = [{ label: "Wiki", href: "/" }];
+  const items: BreadcrumbItem[] = [{ label: "Wiki", href: basePath ? `${basePath}` : "/" }];
 
   let accumulated = "";
   for (const part of slugParts) {
     accumulated = accumulated ? `${accumulated}/${part}` : part;
     items.push({
       label: titles[accumulated] || part.replace(/-/g, " "),
-      href: `/${accumulated}`,
+      href: `${basePath}/${accumulated}`,
     });
   }
 

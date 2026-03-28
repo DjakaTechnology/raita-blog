@@ -9,7 +9,17 @@ import {
   renderMarkdown,
 } from "./markdown";
 
-const WIKI_DIR = path.join(process.cwd(), "content/wiki");
+export const WIKI_LOCALES = ["en", "id"] as const;
+export type WikiLocale = (typeof WIKI_LOCALES)[number];
+
+const WIKI_DIR_BASE = path.join(process.cwd(), "content");
+
+function getWikiDir(locale: WikiLocale = "en"): string {
+  return path.join(WIKI_DIR_BASE, locale === "en" ? "wiki" : `wiki-${locale}`);
+}
+
+// Keep backward compat — default English
+const WIKI_DIR = getWikiDir("en");
 
 function readWikiFile(filePath: string): { frontmatter: WikiFrontmatter; content: string } | null {
   if (!fs.existsSync(filePath)) return null;
@@ -20,19 +30,20 @@ function readWikiFile(filePath: string): { frontmatter: WikiFrontmatter; content
   return { frontmatter, content };
 }
 
-function slugFromPath(filePath: string): string {
-  const relative = path.relative(WIKI_DIR, filePath).replace(/\\/g, "/");
+function slugFromPath(filePath: string, wikiDir: string = WIKI_DIR): string {
+  const relative = path.relative(wikiDir, filePath).replace(/\\/g, "/");
   return relative.replace(/\.md$/, "").replace(/\/index$/, "");
 }
 
-export function getWikiTree(): WikiSection[] {
-  if (!fs.existsSync(WIKI_DIR)) return [];
+export function getWikiTree(locale: WikiLocale = "en"): WikiSection[] {
+  const wikiDir = getWikiDir(locale);
+  if (!fs.existsSync(wikiDir)) return [];
 
   function buildSection(dir: string): WikiSection {
     const indexPath = path.join(dir, "index.md");
     const indexData = readWikiFile(indexPath);
     const dirName = path.basename(dir);
-    const slug = path.relative(WIKI_DIR, dir).replace(/\\/g, "/");
+    const slug = path.relative(wikiDir, dir).replace(/\\/g, "/");
 
     const section: WikiSection = {
       title: indexData?.frontmatter.title || dirName.replace(/-/g, " "),
@@ -53,7 +64,7 @@ export function getWikiTree(): WikiSection[] {
         const data = readWikiFile(fullPath);
         if (data) {
           section.pages.push({
-            slug: slugFromPath(fullPath),
+            slug: slugFromPath(fullPath, wikiDir),
             title: data.frontmatter.title,
             description: data.frontmatter.description || "",
             order: data.frontmatter.order ?? 999,
@@ -67,20 +78,21 @@ export function getWikiTree(): WikiSection[] {
     return section;
   }
 
-  const entries = fs.readdirSync(WIKI_DIR, { withFileTypes: true });
+  const entries = fs.readdirSync(wikiDir, { withFileTypes: true });
   const sections: WikiSection[] = [];
 
   for (const entry of entries) {
     if (entry.isDirectory() && entry.name !== "images") {
-      sections.push(buildSection(path.join(WIKI_DIR, entry.name)));
+      sections.push(buildSection(path.join(wikiDir, entry.name)));
     }
   }
 
   return sections.sort((a, b) => a.order - b.order);
 }
 
-export function getAllWikiSlugs(): string[] {
-  if (!fs.existsSync(WIKI_DIR)) return [];
+export function getAllWikiSlugs(locale: WikiLocale = "en"): string[] {
+  const wikiDir = getWikiDir(locale);
+  if (!fs.existsSync(wikiDir)) return [];
   const slugs: string[] = [];
 
   function walk(dir: string) {
@@ -90,22 +102,23 @@ export function getAllWikiSlugs(): string[] {
       if (entry.isDirectory() && entry.name !== "images") {
         walk(fullPath);
       } else if (entry.isFile() && entry.name.endsWith(".md")) {
-        const slug = slugFromPath(fullPath);
+        const slug = slugFromPath(fullPath, wikiDir);
         if (slug) slugs.push(slug);
       }
     }
   }
 
-  walk(WIKI_DIR);
+  walk(wikiDir);
   return slugs;
 }
 
-export async function getWikiPage(slugParts: string[]): Promise<WikiPage | undefined> {
+export async function getWikiPage(slugParts: string[], locale: WikiLocale = "en"): Promise<WikiPage | undefined> {
+  const wikiDir = getWikiDir(locale);
   const slugPath = slugParts.join("/");
 
-  let filePath = path.join(WIKI_DIR, `${slugPath}.md`);
+  let filePath = path.join(wikiDir, `${slugPath}.md`);
   if (!fs.existsSync(filePath)) {
-    filePath = path.join(WIKI_DIR, slugPath, "index.md");
+    filePath = path.join(wikiDir, slugPath, "index.md");
   }
   if (!fs.existsSync(filePath)) return undefined;
 
@@ -113,12 +126,13 @@ export async function getWikiPage(slugParts: string[]): Promise<WikiPage | undef
   if (!data) return undefined;
 
   const manifest = loadManifest();
-  const dirForImages = path.dirname(path.relative(WIKI_DIR, filePath)).replace(/\\/g, "/");
+  const dirForImages = path.dirname(path.relative(wikiDir, filePath)).replace(/\\/g, "/");
   const imageContext = `wiki/${dirForImages}/images`;
 
+  const basePath = locale === "en" ? "/wiki" : `/wiki/id`;
   let html = await renderMarkdown(data.content);
   html = rewriteImageUrls(html, imageContext, manifest, "/wiki");
-  html = rewriteCrossLinks(html, "/wiki");
+  html = rewriteCrossLinks(html, basePath);
 
   return {
     slug: slugPath,
@@ -129,8 +143,8 @@ export async function getWikiPage(slugParts: string[]): Promise<WikiPage | undef
   };
 }
 
-export function getWikiSection(slug: string): WikiSection | undefined {
-  const sections = getWikiTree();
+export function getWikiSection(slug: string, locale: WikiLocale = "en"): WikiSection | undefined {
+  const sections = getWikiTree(locale);
 
   function find(sections: WikiSection[], target: string): WikiSection | undefined {
     for (const s of sections) {
@@ -145,8 +159,8 @@ export function getWikiSection(slug: string): WikiSection | undefined {
 }
 
 /** Flat ordered list of all pages following the sidebar order (section index → pages → children recursively) */
-export function getWikiPageList(): WikiPageMeta[] {
-  const sections = getWikiTree();
+export function getWikiPageList(locale: WikiLocale = "en"): WikiPageMeta[] {
+  const sections = getWikiTree(locale);
   const list: WikiPageMeta[] = [];
 
   function flatten(section: WikiSection) {
@@ -174,8 +188,9 @@ export function getWikiPageList(): WikiPageMeta[] {
   return list;
 }
 
-export function getAllWikiPageMeta(): WikiPageMeta[] {
-  if (!fs.existsSync(WIKI_DIR)) return [];
+export function getAllWikiPageMeta(locale: WikiLocale = "en"): WikiPageMeta[] {
+  const wikiDir = getWikiDir(locale);
+  if (!fs.existsSync(wikiDir)) return [];
   const pages: WikiPageMeta[] = [];
 
   function walk(dir: string) {
@@ -187,7 +202,7 @@ export function getAllWikiPageMeta(): WikiPageMeta[] {
       } else if (entry.isFile() && entry.name.endsWith(".md")) {
         const data = readWikiFile(fullPath);
         if (data) {
-          const slug = slugFromPath(fullPath);
+          const slug = slugFromPath(fullPath, wikiDir);
           pages.push({
             slug,
             title: data.frontmatter.title,
@@ -199,6 +214,6 @@ export function getAllWikiPageMeta(): WikiPageMeta[] {
     }
   }
 
-  walk(WIKI_DIR);
+  walk(wikiDir);
   return pages;
 }

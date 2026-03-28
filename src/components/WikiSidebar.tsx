@@ -21,7 +21,7 @@ function isActive(currentSlug: string, sectionSlug: string) {
   return currentSlug === sectionSlug || currentSlug.startsWith(sectionSlug + "/");
 }
 
-function SidebarSection({ section, currentSlug, depth = 0 }: { section: WikiSection; currentSlug: string; depth?: number }) {
+function SidebarSection({ section, currentSlug, linkPrefix = "", depth = 0 }: { section: WikiSection; currentSlug: string; linkPrefix?: string; depth?: number }) {
   const [expanded, setExpanded] = useState(
     isActive(currentSlug, section.slug)
   );
@@ -49,7 +49,7 @@ function SidebarSection({ section, currentSlug, depth = 0 }: { section: WikiSect
           </button>
         )}
         <Link
-          href={`/${section.slug}`}
+          href={`${linkPrefix}/${section.slug}`}
           className={`text-sm py-1 px-1 rounded transition-colors flex-1 ${
             currentSlug === section.slug
               ? "text-primary font-medium bg-primary/10"
@@ -64,7 +64,7 @@ function SidebarSection({ section, currentSlug, depth = 0 }: { section: WikiSect
           {section.pages.map((page) => (
             <Link
               key={page.slug}
-              href={`/${page.slug}`}
+              href={`${linkPrefix}/${page.slug}`}
               className={`text-sm py-1 px-1 ml-4 rounded transition-colors ${
                 currentSlug === page.slug
                   ? "text-primary font-medium bg-primary/10"
@@ -75,7 +75,7 @@ function SidebarSection({ section, currentSlug, depth = 0 }: { section: WikiSect
             </Link>
           ))}
           {section.children.map((child) => (
-            <SidebarSection key={child.slug} section={child} currentSlug={currentSlug} depth={depth + 1} />
+            <SidebarSection key={child.slug} section={child} currentSlug={currentSlug} linkPrefix={linkPrefix} depth={depth + 1} />
           ))}
         </div>
       )}
@@ -85,7 +85,9 @@ function SidebarSection({ section, currentSlug, depth = 0 }: { section: WikiSect
 
 export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
   const pathname = usePathname();
-  const currentSlug = pathname.replace(/^\/wiki\/?/, "").replace(/^\//, "").replace(/\/$/, "");
+  const isIndonesian = pathname.startsWith("/wiki/id") || pathname === "/wiki/id";
+  const currentSlug = pathname.replace(/^\/wiki\/?/, "").replace(/^id\/?/, "").replace(/^\//, "").replace(/\/$/, "");
+  const linkPrefix = isIndonesian ? "/id" : "";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -138,7 +140,7 @@ export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
             {searchResults.map((page) => (
               <Link
                 key={page.slug}
-                href={`/${page.slug}`}
+                href={`${linkPrefix}/${page.slug}`}
                 onClick={() => setQuery("")}
                 className={`text-sm py-1.5 px-2 rounded transition-colors ${
                   currentSlug === page.slug
@@ -156,16 +158,30 @@ export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
         ) : (
           <nav className="flex flex-col gap-1">
             <Link
-              href="/"
+              href={linkPrefix ? `${linkPrefix}` : "/"}
               className={`text-sm font-semibold py-1.5 px-2 rounded transition-colors ${
                 currentSlug === "" ? "text-primary bg-primary/10" : "text-foreground hover:bg-muted"
               }`}
             >
               Wiki Home
             </Link>
+            <div className="flex gap-1 mt-1 mb-1">
+              <Link
+                href="/"
+                className={`text-xs px-2 py-1 rounded transition-colors ${!isIndonesian ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                EN
+              </Link>
+              <Link
+                href="/id"
+                className={`text-xs px-2 py-1 rounded transition-colors ${isIndonesian ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                ID
+              </Link>
+            </div>
             <div className="mt-2 flex flex-col gap-1">
               {sections.map((section) => (
-                <SidebarSection key={section.slug} section={section} currentSlug={currentSlug} />
+                <SidebarSection key={section.slug} section={section} currentSlug={currentSlug} linkPrefix={linkPrefix} />
               ))}
             </div>
           </nav>
