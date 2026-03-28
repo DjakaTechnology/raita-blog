@@ -28,13 +28,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       type: "website",
       url: `https://raita.ai/wiki/${locale}`,
       siteName: "Raita Wiki",
-      images: [{ url: "https://raita-wiki.vercel.app/wiki/og-wiki.png", width: 1200, height: 630, alt: "Raita Wiki" }],
+      images: [{ url: "https://www.raita.ai/wiki/og-wiki.png", width: 1200, height: 630, alt: "Raita Wiki" }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["https://raita-wiki.vercel.app/wiki/og-wiki.png"],
+      images: ["https://www.raita.ai/wiki/og-wiki.png"],
     },
   };
 }
