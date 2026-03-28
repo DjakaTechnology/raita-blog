@@ -52,7 +52,7 @@ The **AI Filtered** tab displays feed items that did not match your AI filter cr
 
 You can also undo dismissals or override previously skipped items by clicking "Generate" from the Skipped or AI Filtered tabs.
 
-![Feed inbox with Research and Skip actions](../images/auto-pilot-dashboard.png)
+![Feed inbox with Generate and Skip actions](../images/feed-monitor-inbox.png)
 
 ![AI Filtered section showing filtered feed articles with reasons](../images/feed-monitor-ai-filtered.png)
 
