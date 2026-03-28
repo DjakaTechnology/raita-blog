@@ -7,9 +7,12 @@ const WIKI_DIR = path.join(process.cwd(), "content/wiki");
 const WIKI_ID_DIR = path.join(process.cwd(), "content/wiki-id");
 const OUTPUT_PATH = path.join(process.cwd(), "public/sitemap.xml");
 
+const isWiki = fs.existsSync(path.join(process.cwd(), "src/app-blog-backup"));
+
 function main() {
   const urls = [];
 
+  if (!isWiki) {
   urls.push({ loc: "https://raita.ai/blog", changefreq: "daily", priority: "1.0" });
   const categories = new Set();
   if (fs.existsSync(BLOG_DIR)) {
@@ -26,7 +29,9 @@ function main() {
   for (const cat of categories) {
     urls.push({ loc: `https://raita.ai/blog/category/${encodeURIComponent(cat)}`, changefreq: "weekly", priority: "0.5" });
   }
+  } // end if (!isWiki)
 
+  if (isWiki) {
   // English wiki
   urls.push({ loc: "https://raita.ai/wiki/en", changefreq: "weekly", priority: "0.9" });
   function walkWikiLocale(wikiDir, urlPrefix) {
@@ -54,6 +59,7 @@ function main() {
   // Indonesian wiki
   urls.push({ loc: "https://raita.ai/wiki/id", changefreq: "weekly", priority: "0.9" });
   walkWikiLocale(WIKI_ID_DIR, "https://raita.ai/wiki/id");
+  } // end if (isWiki)
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
