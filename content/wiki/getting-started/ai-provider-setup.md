@@ -1,7 +1,7 @@
 ---
 title: "AI Provider Setup"
 description: "Configure Raita Managed or bring your own API keys (BYOK)."
-order: 4
+order: 5
 draft: false
 ---
 

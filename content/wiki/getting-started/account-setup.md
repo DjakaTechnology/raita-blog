@@ -1,7 +1,7 @@
 ---
 title: "Account Setup"
 description: "Create your account, log in, and activate your subscription."
-order: 3
+order: 4
 draft: false
 ---
 

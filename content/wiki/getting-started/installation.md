@@ -1,7 +1,7 @@
 ---
 title: "Installation"
 description: "Download and install Raita on Windows or macOS."
-order: 2
+order: 3
 draft: false
 ---
 

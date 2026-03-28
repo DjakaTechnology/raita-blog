@@ -1,7 +1,7 @@
 ---
 title: "What is Raita?"
 description: "An overview of what Raita is, who it's for, and how it works."
-order: 1
+order: 2
 draft: false
 ---
 
