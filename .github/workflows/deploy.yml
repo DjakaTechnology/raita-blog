@@ -24,6 +24,13 @@ jobs:
 
       - run: npm ci
 
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-blog-${{ hashFiles('package-lock.json') }}-${{ hashFiles('content/blog/**') }}
+          restore-keys: nextjs-blog-${{ hashFiles('package-lock.json') }}-
+
       - name: Pull Vercel config
         run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
@@ -53,6 +60,13 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-wiki-${{ hashFiles('package-lock.json') }}-${{ hashFiles('content/wiki/**', 'content/wiki-id/**') }}
+          restore-keys: nextjs-wiki-${{ hashFiles('package-lock.json') }}-
 
       - name: Pull Vercel config
         run: npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
