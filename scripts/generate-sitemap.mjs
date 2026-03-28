@@ -28,7 +28,7 @@ function main() {
   }
 
   // English wiki
-  urls.push({ loc: "https://raita.ai/wiki", changefreq: "weekly", priority: "0.9" });
+  urls.push({ loc: "https://raita.ai/wiki/en", changefreq: "weekly", priority: "0.9" });
   function walkWikiLocale(wikiDir, urlPrefix) {
     if (!fs.existsSync(wikiDir)) return;
     function walk(dir) {
@@ -49,7 +49,7 @@ function main() {
     }
     walk(wikiDir);
   }
-  walkWikiLocale(WIKI_DIR, "https://raita.ai/wiki");
+  walkWikiLocale(WIKI_DIR, "https://raita.ai/wiki/en");
 
   // Indonesian wiki
   urls.push({ loc: "https://raita.ai/wiki/id", changefreq: "weekly", priority: "0.9" });

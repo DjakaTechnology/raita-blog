@@ -85,9 +85,12 @@ function SidebarSection({ section, currentSlug, linkPrefix = "", depth = 0 }: { 
 
 export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
   const pathname = usePathname();
-  const isIndonesian = pathname.startsWith("/wiki/id") || pathname === "/wiki/id";
-  const currentSlug = pathname.replace(/^\/wiki\/?/, "").replace(/^id\/?/, "").replace(/^\//, "").replace(/\/$/, "");
-  const linkPrefix = isIndonesian ? "/id" : "";
+  // Extract locale from /wiki/en/... or /wiki/id/...
+  const localeMatch = pathname.match(/^\/wiki\/(en|id)(?:\/|$)/);
+  const locale = localeMatch ? localeMatch[1] : "en";
+  const isIndonesian = locale === "id";
+  const currentSlug = pathname.replace(/^\/wiki\/(?:en|id)\/?/, "").replace(/^\//, "").replace(/\/$/, "");
+  const linkPrefix = `/${locale}`;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -158,7 +161,7 @@ export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
         ) : (
           <nav className="flex flex-col gap-1">
             <Link
-              href={linkPrefix ? `${linkPrefix}` : "/"}
+              href={`/${locale}`}
               className={`text-sm font-semibold py-1.5 px-2 rounded transition-colors ${
                 currentSlug === "" ? "text-primary bg-primary/10" : "text-foreground hover:bg-muted"
               }`}
@@ -167,7 +170,7 @@ export default function WikiSidebar({ sections }: { sections: WikiSection[] }) {
             </Link>
             <div className="flex gap-1 mt-1 mb-1">
               <Link
-                href="/"
+                href="/en"
                 className={`text-xs px-2 py-1 rounded transition-colors ${!isIndonesian ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"}`}
               >
                 EN
