@@ -21,6 +21,10 @@ Feed sources are created and managed at the project level. To add a new feed sou
 
 ![Feed source settings with RSS/Sitemap selected](../images/feed-monitor-form.png)
 
+You can also choose an existing source and configure it further — set the AI filter to match your niche (e.g. "only work on politics"), choose a daily limit, and pick a generation prompt template.
+
+![Feed source with AI filter configured](../images/feed-monitor-ai-filter-setup.png)
+
 ### Attaching a Prompt Template
 
 Each feed source can have an optional article generation template attached. When a feed item is approved and converted to an Article Worker:
